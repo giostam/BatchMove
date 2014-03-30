@@ -59,6 +59,7 @@ public class SelectionFrame extends javax.swing.JFrame {
         helpTxt = new javax.swing.JTextArea();
         selectSourceDirBtn = new javax.swing.JButton();
         sourceDir = new javax.swing.JTextField();
+        selectFiles = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("selectionFrame"); // NOI18N
@@ -88,6 +89,13 @@ public class SelectionFrame extends javax.swing.JFrame {
 
         sourceDir.setEditable(false);
 
+        selectFiles.setText("Select Files");
+        selectFiles.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectFilesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -96,11 +104,14 @@ public class SelectionFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(importFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(sourceDir, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sourceDir, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                            .addComponent(selectFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(selectSourceDirBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(importFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(selectSourceDirBtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -110,8 +121,13 @@ public class SelectionFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(selectSourceDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
                     .addComponent(sourceDir))
-                .addGap(11, 11, 11)
-                .addComponent(importFile, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addComponent(importFile, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(selectFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                 .addContainerGap())
@@ -134,7 +150,7 @@ public class SelectionFrame extends javax.swing.JFrame {
             File sourceDir = new File(path);
             File[] sourceDirFilesArr = sourceDir.listFiles();
             List<File> sourceDirFiles = Arrays.asList(sourceDirFilesArr);
-            
+
             File selection = fileChooser.getSelectedFile();
 
             List<File> files = new ArrayList<>();
@@ -151,8 +167,6 @@ public class SelectionFrame extends javax.swing.JFrame {
                 ex.printStackTrace();
             }
 
-            FilesFrame filesFrame = new FilesFrame();
-
             String[] columnNames = {"", "Filename", "Size", "Status"};
             Object[][] data = new Object[files.size()][4];
 
@@ -166,98 +180,7 @@ public class SelectionFrame extends javax.swing.JFrame {
                 fileNo++;
             }
 
-            DefaultTableModel model = new DefaultTableModel(data, columnNames) {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public Class<?> getColumnClass(int column) {
-                    return getValueAt(0, column).getClass();
-                }
-
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return column == 0;
-                }
-            };
-            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-            renderer.setHorizontalAlignment(JLabel.CENTER);
-            final JTable table = new JTable(model);
-            for (int i = 1; i < table.getColumnCount(); i++) {
-                table.setDefaultRenderer(table.getColumnClass(i), renderer);
-            }
-//            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            table.setRowHeight(30);
-            table.getTableHeader().setFont(new Font("Serif", Font.BOLD, 14));
-            table.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-            table.setRowSelectionAllowed(false);
-            table.getColumnModel().getColumn(0).setPreferredWidth(15);
-            table.getColumnModel().getColumn(1).setPreferredWidth(350);
-            table.getColumnModel().getColumn(2).setPreferredWidth(40);
-            table.getColumnModel().getColumn(3).setPreferredWidth(40);
-
-            JPanel tblPanel = new JPanel();
-            JPanel btnPanel = new JPanel();
-
-            tblPanel.setLayout(new BorderLayout());
-            if (table.getRowCount() > 15) {
-                JScrollPane scrollPane = new JScrollPane(table);
-                tblPanel.add(scrollPane, BorderLayout.CENTER);
-            } else {
-                tblPanel.add(table.getTableHeader(), BorderLayout.NORTH);
-                tblPanel.add(table, BorderLayout.CENTER);
-            }
-
-            btnPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-            filesFrame.setMinimumSize(new Dimension(800, 600));
-            filesFrame.setLayout(new BorderLayout());
-            filesFrame.add(tblPanel, BorderLayout.NORTH);
-            filesFrame.add(btnPanel, BorderLayout.SOUTH);
-            
-            final JLabel resultsLabel = new JLabel(table.getRowCount() + " files in queue.");
-            
-            JButton moveBtn = new JButton("Copy");
-            moveBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    fileChooser.setDialogTitle("Choose target directory");
-                    int selVal = fileChooser.showOpenDialog(null);
-                    if (selVal == JFileChooser.APPROVE_OPTION) {
-                        File selection = fileChooser.getSelectedFile();
-                        String targetPath = selection.getAbsolutePath();
-                        
-                        DefaultTableModel dtm = (DefaultTableModel) table.getModel();
-                        int nRow = dtm.getRowCount();
-                        int copied = 0;
-                        for (int i = 0; i < nRow; i++) {
-                            Boolean selected = (Boolean)dtm.getValueAt(i, 0);
-                            String filePath = dtm.getValueAt(i, 1).toString();
-                            
-                            if(selected) {
-                                try {
-                                    FileUtils.copyFileToDirectory(new File(filePath), new File(targetPath));
-                                    dtm.setValueAt("Copied", i, 3);
-                                    copied++;
-                                    resultsLabel.setText(copied + " from " + nRow + " copied.");
-                                } catch (Exception ex) {
-                                    Logger.getLogger(SelectionFrame.class.getName()).log(Level.SEVERE, null, ex);
-                                    dtm.setValueAt("Failed", i, 3);
-                                }
-                            }
-                        }
-                        resultsLabel.setText(copied + " from " + nRow + " copied. Finished!");
-                    }
-                }
-            });
-            btnPanel.add(moveBtn);
-            btnPanel.add(resultsLabel);
-
-            filesFrame.revalidate();
-            filesFrame.setVisible(true);
-
-            this.setVisible(false);
+            BatchMoveUtils.showFilesFrame(data, columnNames, this);
         }
     }//GEN-LAST:event_importFileActionPerformed
 
@@ -272,6 +195,32 @@ public class SelectionFrame extends javax.swing.JFrame {
             sourceDir.setText(selectedFolder);
         }
     }//GEN-LAST:event_selectSourceDirBtnActionPerformed
+
+    private void selectFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFilesActionPerformed
+        String path = sourceDir.getText();
+        if (path == null || path.trim().equals("")) {
+            JOptionPane.showMessageDialog(this, "You must first select a source directory", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        File sourceDir = new File(path);
+        File[] sourceDirFilesArr = sourceDir.listFiles();
+        List<File> files = Arrays.asList(sourceDirFilesArr);
+
+        String[] columnNames = {"", "Filename", "Size", "Type"};
+        Object[][] data = new Object[files.size()][4];
+
+        int fileNo = 0;
+        for (File file : files) {
+            data[fileNo][0] = false;
+            data[fileNo][1] = file.getAbsolutePath();
+            data[fileNo][2] = file.length();
+            data[fileNo][3] = file.isFile() ? "File" : "Directory";
+
+            fileNo++;
+        }
+        BatchMoveUtils.showFilesFrame(data, columnNames, this);
+    }//GEN-LAST:event_selectFilesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -313,7 +262,12 @@ public class SelectionFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea helpTxt;
     private javax.swing.JButton importFile;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton selectFiles;
     private javax.swing.JButton selectSourceDirBtn;
     private javax.swing.JTextField sourceDir;
     // End of variables declaration//GEN-END:variables
+
+    public JFileChooser getFileChooser() {
+        return fileChooser;
+    }
 }

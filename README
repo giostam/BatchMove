@@ -1,3 +1,4 @@
 BatchMove
 
-A Maven application that copies files from one directory to another based on a .txt file that contains the filenames to be copied
+A Maven application that copies files from one directory to another.
+You can select files from the source directory or the selection can be based on a .txt file that contains the filenames to be copied.
