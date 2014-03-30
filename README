@@ -1,0 +1,3 @@
+BatchMove
+
+A Maven application that copies files from one directory to another based on a .txt file that contains the filenames to be copied
